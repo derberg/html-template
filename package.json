@@ -1,6 +1,6 @@
 {
   "name": "@asyncapi/html-template",
-  "version": "0.15.4",
+  "version": "0.23.3",
   "description": "HTML template for the AsyncAPI generator.",
   "keywords": [
     "asyncapi",
@@ -20,28 +20,36 @@
   "homepage": "https://github.com/asyncapi/html-template#readme",
   "scripts": {
     "lint": "echo \"No linter specified yet\"",
-    "test": "ava",
     "release": "semantic-release",
-    "develop": "ag https://raw.githubusercontent.com/asyncapi/generator/v1.0.0-rc.12/test/docs/dummy.yml ./ -o test/output --force-write --watch-template",
-    "generate:assets": "echo 'No additional assets need to be generated at the moment'",
-    "bump:version": "npm --no-git-tag-version --allow-same-version version $VERSION"
+    "develop": "npm run generate:assets && ag https://raw.githubusercontent.com/asyncapi/generator/v1.1.5/test/docs/dummy.yml ./ -o test/output --force-write --watch-template",
+    "//develop:install": "Force ag to install your local html-template source code",
+    "develop:install": " npm run develop -- --install",
+    "generate:assets": "npm run copy:sources",
+    "bump:version": "npm --no-git-tag-version --allow-same-version version $VERSION",
+    "copy:sources": "node ./scripts/copy-sources.js",
+    "prepublishOnly": "npm run generate:assets",
+    "test": "jest --coverage"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@asyncapi/generator-filters": "^1.1.0",
-    "rimraf": "^3.0.2",
-    "puppeteer": "^5.3.1"
+    "@asyncapi/react-component": "^1.0.0-next.13",
+    "puppeteer": "^5.3.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "rimraf": "^3.0.2"
   },
   "devDependencies": {
-    "@asyncapi/parser": "^1.3.2",
+    "@asyncapi/parser": "^1.7.0",
     "@semantic-release/commit-analyzer": "^8.0.1",
     "@semantic-release/github": "^7.0.4",
     "@semantic-release/npm": "^7.0.3",
     "@semantic-release/release-notes-generator": "^9.0.1",
-    "ava": "^3.9.0",
     "conventional-changelog-conventionalcommits": "^4.2.3",
+    "cross-env": "^7.0.3",
+    "jest": "^26.6.3",
+    "jest-esm-transformer": "^1.0.0",
     "semantic-release": "^17.0.4"
   },
   "release": {
@@ -75,6 +83,10 @@
         "description": "Sets the base URL for links and forms.",
         "required": false
       },
+      "version": {
+        "description": "Override the version of your application provided under `info.version` location in the specification file.",
+        "required": false
+      },
       "singleFile": {
         "description": "If set this parameter to true generate single html file with scripts and styles inside",
         "required": false,
@@ -90,15 +102,14 @@
         "default": false
       }
     },
-    "generator": ">=0.50.0 <2.0.0",
-    "filters": [
-      "@asyncapi/generator-filters"
+    "generator": ">=1.7.3 <2.0.0",
+    "nonRenderableFiles": [
+      "js/asyncapi-ui.min.js"
     ]
   },
-  "ava": {
-    "files": [
-      "!test/output",
-      "!test/spec"
-    ]
+  "jest": {
+    "transform": {
+      "\\.m?jsx?$": "jest-esm-transformer"
+    }
   }
 }
